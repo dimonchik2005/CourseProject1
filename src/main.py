@@ -1,6 +1,12 @@
+from pathlib import Path
+
+from src.services import (search_person_transfers, search_phone_numbers,
+                          simple_search)
 from src.utils import read_excel_file
-from src.views import main_page
 
-transactions = read_excel_file("data/operations.xlsx")
+ROOT_DIR = Path(__file__).resolve().parent.parent
+transactions = read_excel_file(str(ROOT_DIR / "data" / "operations.xlsx"))
 
-print(main_page("2021-12-21 12:00:00", transactions))
+print(simple_search(transactions, "перевод"))
+print(search_phone_numbers(transactions))
+print(search_person_transfers(transactions))
