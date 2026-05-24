@@ -26,8 +26,11 @@ def filter_transactions_by_month(
     date_time: str,
 ) -> pd.DataFrame:
     """Возвращает транзакции с начала месяца до указанной даты."""
-    current_date = datetime.strptime(date_time, "%Y-%m-%d %H:%M:%S")
-    start_date = current_date.replace(day=1)
+    if transactions.empty or "Дата операции" not in transactions.columns:
+        return pd.DataFrame()
+
+    current_date = pd.to_datetime(date_time)
+    start_date = current_date.replace(day=1, hour=0, minute=0, second=0)
 
     transactions = transactions.copy()
     transactions["Дата операции"] = pd.to_datetime(
@@ -43,17 +46,23 @@ def filter_transactions_by_month(
 
 def get_cards_info(transactions: pd.DataFrame) -> list[dict[str, Any]]:
     """Возвращает информацию по картам: последние цифры, траты и кешбэк."""
-    if transactions.empty or "Номер карты" not in transactions.columns:
+    required_columns = {"Номер карты", "Сумма платежа"}
+
+    if transactions.empty or not required_columns.issubset(transactions.columns):
         return []
 
     expenses = transactions[transactions["Сумма платежа"] < 0].copy()
+
+    if expenses.empty:
+        return []
+
     expenses["Сумма платежа"] = expenses["Сумма платежа"].abs()
 
     grouped = expenses.groupby("Номер карты")["Сумма платежа"].sum()
 
     return [
         {
-            "last_digits": str(card),
+            "last_digits": str(card).replace(".0", ""),
             "total_spent": round(float(total), 2),
             "cashback": round(float(total) / 100, 2),
         }
