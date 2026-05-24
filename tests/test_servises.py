@@ -6,19 +6,12 @@ from src.services import (search_person_transfers, search_phone_numbers,
                           simple_search)
 
 
-def test_simple_search_by_description() -> None:
-    data = pd.DataFrame(
-        [
-            {"Описание": "Перевод Ивану", "Категория": "Переводы"},
-            {"Описание": "Покупка в магазине", "Категория": "Супермаркеты"},
-        ]
-    )
-
-    result = simple_search(data, "ивану")
+def test_simple_search_by_description(sample_transactions: pd.DataFrame) -> None:
+    result = simple_search(sample_transactions, "валерий")
     result_data = json.loads(result)
 
     assert len(result_data) == 1
-    assert result_data[0]["Описание"] == "Перевод Ивану"
+    assert result_data[0]["Описание"] == "Валерий А."
 
 
 def test_simple_search_by_category() -> None:

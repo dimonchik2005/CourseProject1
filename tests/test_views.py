@@ -2,25 +2,23 @@ import json
 from unittest.mock import patch
 
 import pandas as pd
+import pytest
 
 from src.views import (filter_transactions_by_month, get_cards_info,
                        get_greeting, get_top_transactions, main_page)
 
 
-def test_get_greeting_morning() -> None:
-    assert get_greeting("2021-12-21 07:00:00") == "Доброе утро"
-
-
-def test_get_greeting_day() -> None:
-    assert get_greeting("2021-12-21 13:00:00") == "Добрый день"
-
-
-def test_get_greeting_evening() -> None:
-    assert get_greeting("2021-12-21 19:00:00") == "Добрый вечер"
-
-
-def test_get_greeting_night() -> None:
-    assert get_greeting("2021-12-21 23:30:00") == "Доброй ночи"
+@pytest.mark.parametrize(
+    "date_time, expected",
+    [
+        ("2021-12-21 07:00:00", "Доброе утро"),
+        ("2021-12-21 13:00:00", "Добрый день"),
+        ("2021-12-21 19:00:00", "Добрый вечер"),
+        ("2021-12-21 23:30:00", "Доброй ночи"),
+    ],
+)
+def test_get_greeting(date_time: str, expected: str) -> None:
+    assert get_greeting(date_time) == expected
 
 
 def test_filter_transactions_by_month() -> None:
@@ -46,29 +44,8 @@ def test_filter_transactions_by_month_empty_dataframe() -> None:
     assert result.empty
 
 
-def test_get_cards_info() -> None:
-    transactions = pd.DataFrame(
-        [
-            {
-                "Номер карты": "5814",
-                "Сумма платежа": -1000,
-            },
-            {
-                "Номер карты": "5814",
-                "Сумма платежа": -500,
-            },
-            {
-                "Номер карты": "7512",
-                "Сумма платежа": -200,
-            },
-            {
-                "Номер карты": "7512",
-                "Сумма платежа": 100,
-            },
-        ]
-    )
-
-    result = get_cards_info(transactions)
+def test_get_cards_info(sample_transactions: pd.DataFrame) -> None:
+    result = get_cards_info(sample_transactions)
 
     assert result == [
         {
@@ -78,8 +55,8 @@ def test_get_cards_info() -> None:
         },
         {
             "last_digits": "7512",
-            "total_spent": 200.0,
-            "cashback": 2.0,
+            "total_spent": 300.0,
+            "cashback": 3.0,
         },
     ]
 
