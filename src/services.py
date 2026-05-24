@@ -13,9 +13,14 @@ def simple_search(transactions: pd.DataFrame, search_query: str) -> str:
     pattern = re.compile(search_query, re.IGNORECASE)
 
     filtered_transactions = transactions[
-        transactions["Описание"].fillna(" ").astype(str).apply(lambda value: bool(pattern.search(value)))
+        transactions["Описание"]
+        .fillna(" ")
+        .astype(str)
+        .apply(lambda value: bool(pattern.search(value)))
         | transactions["Категория"]
-        .fillna(" ").astype(str).apply(lambda value: bool(pattern.search(value)))
+        .fillna(" ")
+        .astype(str)
+        .apply(lambda value: bool(pattern.search(value)))
     ]
 
     return filtered_transactions.to_json(orient="records", force_ascii=False)
@@ -29,7 +34,9 @@ def search_phone_numbers(transactions: pd.DataFrame) -> str:
     phone_pattern = re.compile(r"(\+7\s?\d{3}\s?\d{2,3}[-\s]?\d{2}[-\s]?\d{2}|8\d{10})")
 
     filtered_transactions = transactions[
-        transactions["Описание"].fillna(" ").astype(str)
+        transactions["Описание"]
+        .fillna(" ")
+        .astype(str)
         .apply(lambda value: bool(phone_pattern.search(value)))
     ]
 
@@ -45,7 +52,9 @@ def search_person_transfers(transactions: pd.DataFrame) -> str:
 
     filtered_transactions = transactions[
         (transactions["Категория"] == "Переводы")
-        & transactions["Описание"].fillna(" ").astype(str)
+        & transactions["Описание"]
+        .fillna(" ")
+        .astype(str)
         .apply(lambda value: bool(person_name_pattern.search(value)))
     ]
 
