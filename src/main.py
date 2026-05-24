@@ -1,8 +1,6 @@
-from src.utils import read_excel_file, read_user_settings
-
+from src.utils import read_excel_file
+from src.views import main_page
 
 transactions = read_excel_file("data/operations.xlsx")
-settings = read_user_settings("user_settings.json")
 
-print(transactions.head())
-print(settings)
+print(main_page("2021-12-21 12:00:00", transactions))
